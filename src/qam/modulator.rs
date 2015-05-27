@@ -1,13 +1,14 @@
 use std::f32::consts::PI;
-use std::io::stdout;
+use std::io::stderr;
 use std::io::Write;
 
 use qam::Constellation;
-use fir::RootRaisedCosine;
+use fir::{Bandpass, RootRaisedCosine};
 
 pub struct Modulator {
     constellation: Constellation,
     filter: RootRaisedCosine,
+    //filter: Bandpass,
     baud_rate: usize,
     samp_rate: usize,
     carrier: usize,
@@ -18,7 +19,8 @@ pub struct Modulator {
 impl Modulator {
     pub fn new(n: usize, baud_rate: usize, samp_rate: usize) -> Modulator {
         let filter = RootRaisedCosine::new(baud_rate, 0.0);
-        //println!("{:?}", filter);
+        //let filter =  Bandpass::new(1500.0, (baud_rate*2) as f32, 30.0, samp_rate);
+        println!("{:?}", filter);
         Modulator {
             constellation: Constellation::new(n),
             filter: filter,
@@ -31,7 +33,7 @@ impl Modulator {
     }
 
     pub fn modulate_symbol(&mut self, sym: usize) {
-        let mut out = stdout();
+        let mut out = stderr();
 
         let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
 

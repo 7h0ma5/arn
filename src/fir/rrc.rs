@@ -7,12 +7,12 @@ pub struct RootRaisedCosine {
     coeffs: Vec<f32>
 }
 
-
 impl RootRaisedCosine {
     pub fn new(n: usize, r: f32) -> RootRaisedCosine {
         let osf = 2;
         let mut coeffs = Vec::with_capacity(n);
         let mut values = VecDeque::with_capacity(n);
+
         for i in 0..(osf*n+1) {
             let t = (n as isize - i as isize) as f32 / osf as f32;
 
