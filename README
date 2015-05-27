@@ -1,0 +1,25 @@
+# Vergleich der Modulationsverfahren
+
+Bandbreite: 500 Hz
+
+Shannon-Theorem:
+Maximale Übertragunsrate bei 0dB S/N: 500 bit/s
+Maximale Übertragunsrate bei 3dB S/N: 792 bit/s
+Maximale Übertragunsrate bei 6dB S/N: 1160 bit/s
+Maximale Übertragunsrate bei 10dB S/N: 1729 bit/s
+Maximale Übertragunsrate bei 20dB S/N: 3329 bit/s
+
+## FSK
+Maximale Übertragungsrate: 500 bit/s
+
+## BPSK
+Maximale Übertragungsrate: 500 bit/s
+
+## QPSK
+Maximale Übertragungsrate: 1000 bit/s
+
+## 8-PSK
+Maximale Übertragungsrate: 1500 bit/s
+
+## 16-QAM
+Maximale Übertragungsrate: 2000 bit/s
