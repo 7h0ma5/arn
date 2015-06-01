@@ -3,33 +3,31 @@ use std::f32::consts::PI;
 use num::Complex;
 
 impl Filter {
-    pub fn rrc(n: usize, r: f32) -> Filter {
-        let mut coeffs = Vec::with_capacity(n);
+    pub fn rrc(s: usize, r: f32) -> Filter {
+        let n = 6 * s;
+        let mut coeffs = Vec::with_capacity(n+1);
+        let s = s as f32;
 
         for i in 0..(n+1) {
-            let t = (i as isize - (n/2) as isize) as f32 / n as f32;
+            let t = i as f32 - (n as f32/2.0);
 
-            let a = (PI * t * (1.0 - r)).sin();
-            let b = 4.0 * r * t * (PI * t * (1.00 + r)).cos();
-            let c = PI * t * (1.0 - (4.0 * r * t).powf(2.0));
-            let mut d = (a+b)/c;
-
-            if d.is_nan() && ((t - 0.0).abs() < 0.1) {
-                d = (1.0 - r) + (4.0 * r) / PI;
+            if t == 0.0 {
+                let d = 1.0 / s.sqrt() * (1.0 - r + 4.0 * r/PI);
+                coeffs.push(d);
             }
-            else if d.is_infinite() {
-                let e = (1.0 + 2.0/PI) * (PI / (4.0*r)).sin();
-                let f = (1.0 - 2.0/PI) * (PI / (4.0*r)).cos();
-                d = r/(2.0 as f32).sqrt() * (e + f);
+            else if (t.abs() - s/(4.0*r)).abs() < 0.1 {
+                let a = (1.0 + 2.0/PI) * (PI/(4.0*r)).sin();
+                let b = (1.0 - 2.0/PI) * (PI/(4.0*r)).cos();
+                let d = r / (2.0 * s).sqrt() * (a + b);
+                coeffs.push(d);
             }
-            else if !d.is_finite() {
-                d = 0.0;
-                panic!("singularity");
+            else {
+                let a = (PI * t/s * (1.0 - r)).sin();
+                let b = 4.0 * r * t/s * (PI * t/s * (1.0 + r)).cos();
+                let c = PI * t/s * (1.0 - (4.0 * r * t/s).powf(2.0));
+                let d = 1.0 / s.sqrt() * ((a + b) / c);
+                coeffs.push(d);
             }
-
-            //println!("{}\t{}", t, d);
-
-            coeffs.push(d);
         }
 
         Filter::new(coeffs)

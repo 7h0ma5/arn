@@ -12,7 +12,6 @@ pub struct Modulator {
     baud_rate: usize,
     samp_rate: usize,
     carrier: usize,
-    phasor: f32,
     time: usize
 }
 
@@ -26,7 +25,6 @@ impl Modulator {
             samp_rate: samp_rate,
             baud_rate: baud_rate,
             carrier: 1500,
-            phasor: 0.0,
             time: 0
         }
     }
@@ -38,27 +36,18 @@ impl Modulator {
         let samples = self.samp_rate/self.baud_rate;
 
         for _ in 0..samples {
-            let value = point;
-
-            let isample = (value.re * 32767.0) as i16;
-            let qsample = (value.im * 32767.0) as i16;
-
-            out.write_all(&[(isample >> 8) as u8, (isample & 0xff) as u8]);
-            out.write_all(&[(qsample >> 8) as u8, (qsample & 0xff) as u8]);
-
-            point.scale(1.0/self.constellation.max_amplitude);
+            let value = point.scale(1.0/self.constellation.max_amplitude);
 
             let value = self.filter.process(point).scale(0.5);
 
-            let isample = (value.re * 32767.0) as i16;
-            let qsample = (value.im * 32767.0) as i16;
+            let phasor = Complex::from_polar(&1.0, &(2.0 * PI * self.carrier as f32 * self.time as f32/self.samp_rate as f32));
+            let value = value * phasor;
 
-            out.write_all(&[(isample >> 8) as u8, (isample & 0xff) as u8]);
-            out.write_all(&[(qsample >> 8) as u8, (qsample & 0xff) as u8]);
+            let sample = (value.re * 32767.0) as i16;
+            out.write_all(&[(sample >> 8) as u8, (sample & 0xff) as u8]);
+
+            self.time += 1;
         }
-
-        self.phasor += point.arg();
-        self.phasor %= 2.0*PI;
     }
 
     pub fn modulate(&mut self, data: &str) {
