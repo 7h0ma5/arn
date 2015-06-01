@@ -4,11 +4,11 @@ use std::io::Write;
 use num::Complex;
 
 use qam::Constellation;
-use fir::{Bandpass, RootRaisedCosine};
+use fir::Filter;
 
 pub struct Modulator {
     constellation: Constellation,
-    filter: RootRaisedCosine,
+    filter: Filter,
     baud_rate: usize,
     samp_rate: usize,
     carrier: usize,
@@ -18,10 +18,8 @@ pub struct Modulator {
 
 impl Modulator {
     pub fn new(n: usize, baud_rate: usize, samp_rate: usize) -> Modulator {
-        let filter = RootRaisedCosine::new(samp_rate/baud_rate, 0.22);
+        let filter = Filter::rrc(samp_rate/baud_rate, 0.22);
 
-        //let filter =  Bandpass::new(1500.0, (baud_rate*2) as f32, 30.0, samp_rate);
-        //println!("{:?}", filter);
         Modulator {
             constellation: Constellation::new(n),
             filter: filter,
@@ -40,13 +38,6 @@ impl Modulator {
         let samples = self.samp_rate/self.baud_rate;
 
         for _ in 0..samples {
-            //let i = point.re *  (w*t + self.phasor).cos();
-            //let q = point.im * -(w*t + self.phasor).sin();
-            // let q = self.filter_q.process(point.re) * (w*t + self.phasor).cos();
-            // let i = self.filter_i.process(point.im) * -(w*t + self.phasor).sin();
-            // let sample = (q + i) / self.constellation.max_amplitude * 0.9;
-            //let filtered = self.filter_q.process(sample);
-
             let value = point;
 
             let isample = (value.re * 32767.0) as i16;
@@ -55,9 +46,9 @@ impl Modulator {
             out.write_all(&[(isample >> 8) as u8, (isample & 0xff) as u8]);
             out.write_all(&[(qsample >> 8) as u8, (qsample & 0xff) as u8]);
 
-            let value = self.filter.process(point);
+            point.scale(1.0/self.constellation.max_amplitude);
 
-            value.scale(1.0/self.constellation.max_amplitude * 0.9);
+            let value = self.filter.process(point).scale(0.5);
 
             let isample = (value.re * 32767.0) as i16;
             let qsample = (value.im * 32767.0) as i16;

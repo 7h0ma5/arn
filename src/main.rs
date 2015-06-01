@@ -14,16 +14,17 @@ mod qam;
 fn main() {
     //audio::init();
 
-    /*
+
     let mut modulator = qam::Modulator::new(4, 500, 44100);
 
     let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
     let mut s = String::new();
     f.read_to_string(&mut s);
     modulator.modulate(s.slice_chars(0, 500));
-    */
 
-    let mut test = fir::RootRaisedCosine::new(100, 0.22);
+    /*
+
+    let mut test = fir::Filter::rrc(100, 0.22);
 
     for i in 0..100 {
         println!("{}\t{}\t{}", i, 1.0, test.process(Complex::new(1.0, 0.0)).re);
@@ -48,4 +49,6 @@ fn main() {
     for i in 0..100 {
         println!("{}\t{}\t{}", i+500, 1.0, test.process(Complex::new(1.0, 0.0)).re);
     }
+
+    */
 }
