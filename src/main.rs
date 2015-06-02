@@ -3,10 +3,12 @@
 extern crate portaudio;
 extern crate num;
 
+use std::thread;
 use std::io::prelude::*;
 use std::fs::File;
 use num::Complex;
 
+mod layer;
 mod audio;
 mod fir;
 mod qam;
@@ -14,14 +16,23 @@ mod qam;
 fn main() {
     //audio::init();
 
-    let mut modulator = qam::Modulator::new(4, 125, 44100);
-
     let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
     let mut s = String::new();
     f.read_to_string(&mut s);
 
-    modulator.modulate(s.slice_chars(0, 500));
+    //modulator.modulate(s.slice_chars(0, 500));
 
+    let mut physical = layer::Physical::new();
+
+    let input = physical.tx.clone();
+
+    thread::spawn(move || {
+        physical.run();
+    });
+
+    input.send(s.as_str());
+
+    loop {}
 
     /*
     let n = 8;
