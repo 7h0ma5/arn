@@ -19,7 +19,7 @@ impl Demodulator {
     pub fn new(n: usize, baud_rate: usize, samp_rate: usize) -> Modulator {
         let filter = Filter::rrc(samp_rate/baud_rate, 0.22);
 
-        Modulator {
+        Demodulator {
             constellation: Constellation::new(n),
             filter: filter,
             samp_rate: samp_rate,
@@ -29,7 +29,7 @@ impl Demodulator {
         }
     }
 
-    pub fn modulate(&mut self, data: &str) {
+    pub fn demodulate(&mut self, data: &str) {
         let bits = self.constellation.bits_per_symbol;
         let mut size: usize = 0;
         let mut symbol: usize = 0;

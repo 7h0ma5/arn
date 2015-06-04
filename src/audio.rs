@@ -37,9 +37,8 @@ pub fn init() {
 
     stream.start().unwrap();
 
-    fn wait_for_stream<F: Fn() -> Result<pa::StreamAvailable, pa::error::Error>>(f: F, name: &str)
-                                                                                     -> u32 {
-        'waiting_for_stream: loop {
+    fn wait_for_stream<F: Fn() -> Result<pa::StreamAvailable, pa::error::Error>>(f: F, name: &str) -> u32 {
+        loop {
             match f() {
                 Ok(available) => match available {
                     pa::StreamAvailable::Frames(frames) => return frames as u32,
@@ -53,7 +52,7 @@ pub fn init() {
 
     let mut buffer = Vec::with_capacity((FRAMES * CHANNELS) as usize);
 
-    'stream: loop {
+    loop {
         let in_frames = wait_for_stream(|| stream.get_stream_read_available(), "Read");
 
         if in_frames > 0 {
