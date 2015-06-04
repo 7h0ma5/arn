@@ -4,14 +4,14 @@ use qam;
 
 pub struct Physical {
     modulator: qam::Modulator,
-    rx: Receiver<&str>,
-    pub tx: Sender<&str>,
+    rx: Receiver<String>,
+    pub tx: Sender<String>,
 }
 
 impl Physical {
     pub fn new() -> Physical {
         let mut modulator = qam::Modulator::new(4, 125, 44100);
-        let (tx, rx): (Sender<i32>, Receiver<i32>) = mpsc::channel();
+        let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
 
         Physical {
             modulator: modulator,

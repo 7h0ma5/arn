@@ -30,7 +30,7 @@ fn main() {
         physical.run();
     });
 
-    input.send(s.as_str());
+    input.send(s);
 
     loop {}
 
