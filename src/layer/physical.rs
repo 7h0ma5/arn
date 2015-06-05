@@ -1,4 +1,5 @@
 use qam;
+use audio;
 
 pub struct Physical {
     modulator: qam::Modulator,
@@ -6,26 +7,19 @@ pub struct Physical {
 
 impl Physical {
     pub fn new() -> Physical {
-        let mut modulator = qam::Modulator::new(4, 125, 44100);
+        let mut output = audio::Output::new();
+        let mut modulator = qam::Modulator::new(512, 2300, output);
 
         Physical {
             modulator: modulator
         }
     }
 
-    pub fn run(&mut self) {
-        println!("running physical layer!");
-        loop {
-            let data = self.rx.recv().unwrap();
-            println!("got data: {}", data);
-        }
-    }
-
-    pub fn send(&mut self, String data) {
-
+    pub fn send(&mut self, data: &str) {
+        self.modulator.modulate(data);
     }
 
     pub fn recv(&mut self) -> String {
-
+        String::from_str("Test")
     }
 }
