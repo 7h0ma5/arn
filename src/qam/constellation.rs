@@ -2,15 +2,34 @@ use num::pow;
 use num::Complex;
 use std::cmp::max;
 
+#[derive(Debug)]
 pub struct Constellation {
     pub points: Vec<Complex<f32>>,
     pub avg_power: f32,
     pub bits_per_symbol: usize,
-    pub max_amplitude: f32
+    pub scale: f32
+}
+
+pub fn toGray(number: usize) -> usize {
+    (number >> 1) ^ number
+}
+
+pub fn fromGray(number: usize) -> usize {
+    let mut number = number;
+    let mut mask = number >> 1;
+
+    while mask != 0 {
+        number = number ^ mask;
+        mask >>= 1;
+    }
+
+    return number;
 }
 
 impl Constellation {
     pub fn new(n: usize) -> Constellation {
+        assert!(n > 1 && n % 2 == 0);
+
         let bits = (n as f32).log2() as usize;
         let symbols = pow(2, bits);
 
@@ -32,6 +51,8 @@ impl Constellation {
                 points[symbol] = point;
                 sum += norm;
 
+                println!("{:b}: {}", symbol, point);
+
                 if (norm > max_amplitude) {
                     max_amplitude = norm;
                 }
@@ -42,7 +63,7 @@ impl Constellation {
             points: points,
             avg_power: sum/(bits as f32)/max_amplitude,
             bits_per_symbol: bits,
-            max_amplitude: max_amplitude
+            scale: 1.0/max_amplitude
         }
     }
 }

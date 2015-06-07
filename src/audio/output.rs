@@ -3,7 +3,7 @@ use std::mem::replace;
 use std::thread;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 
-const FRAMES_PER_BUFFER: usize = 4096;
+const FRAMES_PER_BUFFER: usize = 16384;
 const SAMPLE_RATE: usize = 44100;
 
 pub struct Output {
@@ -16,14 +16,17 @@ pub struct Output {
 impl Output {
     pub fn new() -> Output {
         let mut stream = pa::Stream::new();
-        let (tx, rx) = sync_channel(25);
+        let (tx, rx) = sync_channel::<Vec<f32>>(10);
 
         let callback = Box::new(move |
             input: &[f32], output: &mut[f32], frames: u32, time_info: &pa::StreamCallbackTimeInfo,
             _flags: pa::StreamCallbackFlags,
         | -> pa::StreamCallbackResult {
 
-            let frames: Vec<f32> = rx.recv().unwrap();
+            let packet = rx.recv();
+            if packet.is_err() { return pa::StreamCallbackResult::Abort; }
+
+            let frames = packet.unwrap();
 
             for (sample, output) in frames.iter().zip(output.iter_mut()) {
                 *output = *sample;
@@ -31,7 +34,6 @@ impl Output {
 
             pa::StreamCallbackResult::Continue
         });
-
 
         stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 0, 1,
                             pa::SampleFormat::Float32, Some(callback)).unwrap();

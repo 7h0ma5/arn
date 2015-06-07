@@ -19,9 +19,11 @@ pub struct Modulator {
 impl Modulator {
     pub fn new(n: usize, baud_rate: usize, output: Output) -> Modulator {
         let filter = Filter::rrc(output.samp_rate/baud_rate, 0.22);
+        let constellation = Constellation::new(n);
+        println!("{:?}", constellation);
 
         Modulator {
-            constellation: Constellation::new(n),
+            constellation: constellation,
             filter: filter,
             output: output,
             baud_rate: baud_rate,
@@ -30,26 +32,21 @@ impl Modulator {
         }
     }
 
+    #[inline]
     pub fn modulate_symbol(&mut self, sym: usize) {
-        let mut out = stderr();
-
-        let point = self.constellation.points[sym];
+        let point = self.constellation.points[sym].scale(self.constellation.scale);
         let samples = self.output.samp_rate/self.baud_rate;
 
+        let w = 2.0 * PI * self.carrier as f32 / self.output.samp_rate as f32;
+
         for _ in 0..samples {
-            let value = point.scale(1.0/self.constellation.max_amplitude);
+            let value = self.filter.process(point);
 
-            let value = self.filter.process(point).scale(0.4);
-
-            let w = 2.0 * PI * self.carrier as f32;
-            let t = self.time as f32/self.output.samp_rate as f32;
+            let t = self.time as f32;
             let phasor = Complex::from_polar(&0.4, &(w * t));
             let value = value * phasor;
 
             self.output.write(value.re);
-
-            //let sample = (phasor.re * 32767.0) as i16;
-            //out.write_all(&[(sample >> 8) as u8, (sample & 0xff) as u8]);
 
             self.time = (self.time + 1) % self.output.samp_rate;
         }
@@ -60,10 +57,7 @@ impl Modulator {
         let mut size: usize = 0;
         let mut symbol: usize = 0;
 
-        let mut out = stdout();
-
         for byte in data.bytes() {
-            //out.write_all(&[byte as u8]);
             for i in 0..8 {
                 symbol |= (((byte as usize) & (1 << i)) >> i) << size;
                 size += 1;

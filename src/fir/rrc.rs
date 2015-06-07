@@ -4,7 +4,7 @@ use num::Complex;
 
 impl Filter {
     pub fn rrc(s: usize, r: f32) -> Filter {
-        let n = 6 * s;
+        let n = 3 * s;
         let mut coeffs = Vec::with_capacity(n+1);
         let s = s as f32;
 

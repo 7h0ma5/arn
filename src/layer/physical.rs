@@ -8,7 +8,7 @@ pub struct Physical {
 impl Physical {
     pub fn new() -> Physical {
         let mut output = audio::Output::new();
-        let mut modulator = qam::Modulator::new(16, 125, output);
+        let mut modulator = qam::Modulator::new(16, 250, output);
 
         Physical {
             modulator: modulator
