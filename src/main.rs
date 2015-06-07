@@ -18,8 +18,7 @@ fn main() {
 
     //let mut input = audio::Input::new();
 
-    //let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
-    let mut f = File::open("/tmp/test").unwrap();
+    let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
     let mut s = String::new();
     f.read_to_string(&mut s);
 
@@ -35,7 +34,5 @@ fn main() {
     });
 
     input.send(s);
-
-    loop {}
     */
 }

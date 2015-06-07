@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use std::io::stderr;
+use std::io::{stdout, stderr};
 use std::io::Write;
 use num::Complex;
 
@@ -25,13 +25,13 @@ impl Modulator {
             filter: filter,
             output: output,
             baud_rate: baud_rate,
-            carrier: 100,
+            carrier: 1500,
             time: 0
         }
     }
 
     pub fn modulate_symbol(&mut self, sym: usize) {
-        //let mut out = stderr();
+        let mut out = stderr();
 
         let point = self.constellation.points[sym];
         let samples = self.output.samp_rate/self.baud_rate;
@@ -39,18 +39,19 @@ impl Modulator {
         for _ in 0..samples {
             let value = point.scale(1.0/self.constellation.max_amplitude);
 
-            //let value = self.filter.process(point).scale(0.1);
+            let value = self.filter.process(point).scale(0.4);
 
             let w = 2.0 * PI * self.carrier as f32;
             let t = self.time as f32/self.output.samp_rate as f32;
-            let phasor = Complex::from_polar(&0.1, &(w * t));
+            let phasor = Complex::from_polar(&0.4, &(w * t));
             let value = value * phasor;
 
             self.output.write(value.re);
-            //let sample = (value.re * 32767.0) as i16;
+
+            //let sample = (phasor.re * 32767.0) as i16;
             //out.write_all(&[(sample >> 8) as u8, (sample & 0xff) as u8]);
 
-            self.time += 1;
+            self.time = (self.time + 1) % self.output.samp_rate;
         }
     }
 
@@ -59,7 +60,10 @@ impl Modulator {
         let mut size: usize = 0;
         let mut symbol: usize = 0;
 
+        let mut out = stdout();
+
         for byte in data.bytes() {
+            //out.write_all(&[byte as u8]);
             for i in 0..8 {
                 symbol |= (((byte as usize) & (1 << i)) >> i) << size;
                 size += 1;
