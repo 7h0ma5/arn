@@ -1,31 +1,31 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::f32::consts::PI;
-use std::io::{stdout, stderr};
-use std::io::Write;
 use num::Complex;
 
 use qam::Constellation;
 use fir::Filter;
-use audio::Output;
+use audio::Audio;
 
 pub struct Modulator {
     constellation: Constellation,
     filter: Filter,
-    output: Output,
+    audio: Rc<RefCell<Audio>>,
     baud_rate: usize,
     carrier: usize,
     time: usize
 }
 
 impl Modulator {
-    pub fn new(n: usize, baud_rate: usize, output: Output) -> Modulator {
-        let filter = Filter::rrc(output.samp_rate/baud_rate, 0.22);
+    pub fn new(n: usize, baud_rate: usize, audio: Rc<RefCell<Audio>>) -> Modulator {
+        let filter = Filter::rrc(audio.borrow().samp_rate/baud_rate, 0.22);
         let constellation = Constellation::new(n);
         println!("{:?}", constellation);
 
         Modulator {
             constellation: constellation,
             filter: filter,
-            output: output,
+            audio: audio,
             baud_rate: baud_rate,
             carrier: 1500,
             time: 0
@@ -35,9 +35,9 @@ impl Modulator {
     #[inline]
     pub fn modulate_symbol(&mut self, sym: usize) {
         let point = self.constellation.points[sym].scale(self.constellation.scale);
-        let samples = self.output.samp_rate/self.baud_rate;
+        let samples = self.audio.borrow().samp_rate/self.baud_rate;
 
-        let w = 2.0 * PI * self.carrier as f32 / self.output.samp_rate as f32;
+        let w = 2.0 * PI * self.carrier as f32 / self.audio.borrow().samp_rate as f32;
 
         for _ in 0..samples {
             let value = self.filter.process(point);
@@ -46,9 +46,9 @@ impl Modulator {
             let phasor = Complex::from_polar(&0.4, &(w * t));
             let value = value * phasor;
 
-            self.output.write(value.re);
+            self.audio.borrow_mut().write(value.re);
 
-            self.time = (self.time + 1) % self.output.samp_rate;
+            self.time = (self.time + 1) % self.audio.borrow().samp_rate;
         }
     }
 
