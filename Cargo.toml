@@ -3,6 +3,20 @@ name = "arn"
 version = "0.1.0"
 authors = ["Thomas Gatzweiler <mail@thomasgatzweiler.com>"]
 
+[profile.dev]
+opt-level = 3
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = false
+debug-assertions = false
+
 [dependencies]
 portaudio = "*"
 num = "*"

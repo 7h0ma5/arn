@@ -45,7 +45,7 @@ impl Audio {
             pa::StreamCallbackResult::Continue
         });
 
-        stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 1, 1,
+        stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 0, 1,
                             pa::SampleFormat::Float32, Some(callback)).unwrap();
 
         stream.start().unwrap();
