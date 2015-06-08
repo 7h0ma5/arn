@@ -19,23 +19,33 @@ impl Audio {
         let mut stream = pa::Stream::new();
         let (tx, rx) = sync_channel::<Vec<f32>>(10);
 
-        let callback = Box::new(move |input: &[f32], output: &mut[f32], frames: u32,
+        let callback = Box::new(move |input: &[f32], output: &mut [f32], frames: u32,
             time_info: &pa::StreamCallbackTimeInfo, _flags: pa::StreamCallbackFlags |
             -> pa::StreamCallbackResult
         {
-            let packet = rx.recv();
-            if packet.is_err() { return pa::StreamCallbackResult::Abort; }
+            let packet = rx.try_recv();
 
-            let frames = packet.unwrap();
+            if packet.is_ok() {
+                let frames = packet.unwrap();
+                println!("output: data!");
 
-            for (sample, output) in frames.iter().zip(output.iter_mut()) {
-                *output = *sample;
+                for (sample, output) in frames.iter().zip(output.iter_mut()) {
+                    *output = *sample;
+                }
             }
+            else {
+                println!("output: empty!");
+                for output in output.iter_mut() {
+                    *output = 0.0;
+                }
+            }
+
+            println!("frames: {}", frames);
 
             pa::StreamCallbackResult::Continue
         });
 
-        stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 0, 1,
+        stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 1, 1,
                             pa::SampleFormat::Float32, Some(callback)).unwrap();
 
         stream.start().unwrap();
