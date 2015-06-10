@@ -16,11 +16,12 @@ pub struct Demodulator {
 
 impl Demodulator {
     pub fn new(n: usize, baud_rate: usize, samp_rate: usize) -> Demodulator {
-        let filter = Filter::rrc(samp_rate/baud_rate, 0.22);
+        let sps = samp_rate as f32 / baud_rate as f32;
+        let taps = Filter::rrc(1.0, sps as f64, 0.22, 20);
 
         Demodulator {
             constellation: Constellation::new(n),
-            filter: filter,
+            filter: Filter::new(sps, taps, 32),
             samp_rate: samp_rate,
             baud_rate: baud_rate,
             carrier: 1500,

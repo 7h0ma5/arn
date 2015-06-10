@@ -60,7 +60,7 @@ impl Audio {
 
     #[inline]
     pub fn write(&mut self, value: f32)  {
-        if (self.buffer.len() >= FRAMES_PER_BUFFER) {
+        if self.buffer.len() >= FRAMES_PER_BUFFER {
             let buffer = replace(&mut self.buffer, Vec::with_capacity(FRAMES_PER_BUFFER));
             self.tx.send(buffer).unwrap();
         }

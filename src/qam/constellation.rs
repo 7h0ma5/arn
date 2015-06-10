@@ -6,8 +6,7 @@ use std::cmp::max;
 pub struct Constellation {
     pub points: Vec<Complex<f32>>,
     pub avg_power: f32,
-    pub bits_per_symbol: usize,
-    pub scale: f32
+    pub bits_per_symbol: usize
 }
 
 pub fn toGray(number: usize) -> usize {
@@ -59,11 +58,16 @@ impl Constellation {
             }
         }
 
+        let scale = 1.0/max_amplitude;
+
+        for i in 0..points.len() {
+            points[i] = points[i].scale(scale);
+        }
+
         Constellation {
             points: points,
             avg_power: sum/(bits as f32)/max_amplitude,
-            bits_per_symbol: bits,
-            scale: 1.0/max_amplitude
+            bits_per_symbol: bits
         }
     }
 }

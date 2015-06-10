@@ -2,34 +2,33 @@ use num::Complex;
 
 pub mod rrc;
 
+#[derive(Debug)]
 pub struct Filter {
     values: Vec<Complex<f32>>,
-    coeffs: Vec<f32>,
-    scale: f32,
+    taps: Vec<f32>,
+    rate: f32,
     pos: usize
 }
 
 impl Filter {
-    pub fn new(coeffs: Vec<f32>) -> Filter {
-        let mut values = Vec::with_capacity(coeffs.len());
-        let mut gain = 0.0;
+    pub fn new(rate: f32, taps: Vec<f32>, filter_size: usize) -> Filter {
+        let mut values = Vec::with_capacity(taps.len());
 
-        for coeff in coeffs.iter() {
-            gain += *coeff;
+        for _ in 0..taps.len() {
             values.push(Complex::new(0.0, 0.0));
         }
 
         Filter {
             values: values,
-            coeffs: coeffs,
-            scale: 1.0/gain,
+            taps: taps,
+            rate: rate,
             pos: 0
         }
     }
 
     #[inline]
     pub fn process(&mut self, value: Complex<f32>) -> Complex<f32> {
-        let max = self.coeffs.len();
+        let max = self.taps.len();
         let pos = self.pos;
         let mut out = Complex::new(0.0, 0.0);
 
@@ -37,11 +36,11 @@ impl Filter {
 
         for i in 0..max {
             let idx = (pos + i) % max;
-            out = out + self.values[idx].scale(self.coeffs[i]);
+            out = out + self.values[idx].scale(self.taps[i]);
         }
 
         self.pos = (self.pos + 1) % max;
 
-        return out.scale(self.scale);
+        return out;
     }
 }

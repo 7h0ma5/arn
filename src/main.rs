@@ -20,5 +20,6 @@ fn main() {
 
     let mut physical = layer::Physical::new();
 
-    physical.send(s.slice_chars(0, 1000));
+    //physical.send(s.slice_chars(0, 1000));
+    physical.send(s.as_str());
 }

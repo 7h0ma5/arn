@@ -22,8 +22,7 @@ impl Physical {
     }
 
     pub fn send(&mut self, data: &str) {
-        let ref mut audio = self.audio;
-        self.modulator.modulate(data, &mut |value: f32| { audio.write(value); });
+        self.modulator.modulate(data, &mut self.audio);
     }
 
     pub fn recv(&mut self) -> String {
