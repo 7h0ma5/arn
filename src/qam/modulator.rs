@@ -2,12 +2,12 @@ use std::f32::consts::PI;
 use num::Complex;
 
 use qam::Constellation;
-use fir::Filter;
+use filter::{Filter, Resampler};
 use audio::Audio;
 
 pub struct Modulator {
     constellation: Constellation,
-    filter: Filter,
+    resampler: Resampler,
     baud_rate: usize,
     samp_rate: usize,
     carrier: usize,
@@ -23,11 +23,12 @@ impl Modulator {
         let taps = Filter::rrc(nfilts as f64, sps as f64, 0.22, ntaps);
         let constellation = Constellation::new(n);
 
-        let filter = Filter::new(sps, taps, 32);
+        let resampler = Resampler::new(sps, taps, 32);
+        println!("filter ready");
 
         Modulator {
             constellation: constellation,
-            filter: filter,
+            resampler: resampler,
             samp_rate: samp_rate,
             baud_rate: baud_rate,
             carrier: 1500,
@@ -42,7 +43,7 @@ impl Modulator {
 
         //let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
 
-        let value = self.filter.process(point);
+        let value = self.resampler.process(point);
 
         //let t = self.time as f32;
         //let phasor = Complex::from_polar(&0.4, &(w * t));

@@ -2,12 +2,12 @@ use std::f32::consts::PI;
 use num::Complex;
 
 use qam::Constellation;
-use fir::Filter;
+use filter::{Filter, Resampler};
 use audio::Audio;
 
 pub struct Demodulator {
     constellation: Constellation,
-    filter: Filter,
+    resampler: Resampler,
     samp_rate: usize,
     baud_rate: usize,
     carrier: usize,
@@ -21,7 +21,7 @@ impl Demodulator {
 
         Demodulator {
             constellation: Constellation::new(n),
-            filter: Filter::new(sps, taps, 32),
+            resampler: Resampler::new(sps, taps, 32),
             samp_rate: samp_rate,
             baud_rate: baud_rate,
             carrier: 1500,

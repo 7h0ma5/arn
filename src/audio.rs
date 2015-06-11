@@ -2,7 +2,7 @@ use portaudio::pa;
 use std::mem::replace;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 
-pub const SAMPLE_RATE: usize = 44100;
+pub const SAMPLE_RATE: usize = 48000;
 pub const FRAMES_PER_BUFFER: usize = 4096;
 
 pub struct Audio {
@@ -48,14 +48,16 @@ impl Audio {
         stream.open_default(SAMPLE_RATE as f64, FRAMES_PER_BUFFER as u32, 0, 1,
                             pa::SampleFormat::Float32, Some(callback)).unwrap();
 
-        stream.start().unwrap();
-
         Audio {
             stream: stream,
             buffer: Vec::with_capacity(FRAMES_PER_BUFFER),
             samp_rate: SAMPLE_RATE,
             tx: tx
         }
+    }
+
+    pub fn start(&mut self) {
+        self.stream.start().unwrap();
     }
 
     #[inline]

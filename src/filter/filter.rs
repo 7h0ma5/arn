@@ -1,17 +1,13 @@
 use num::Complex;
 
-pub mod rrc;
-
-#[derive(Debug)]
 pub struct Filter {
     values: Vec<Complex<f32>>,
     taps: Vec<f32>,
-    rate: f32,
     pos: usize
 }
 
 impl Filter {
-    pub fn new(rate: f32, taps: Vec<f32>, filter_size: usize) -> Filter {
+    pub fn new(taps: Vec<f32>) -> Filter {
         let mut values = Vec::with_capacity(taps.len());
 
         for _ in 0..taps.len() {
@@ -21,7 +17,6 @@ impl Filter {
         Filter {
             values: values,
             taps: taps,
-            rate: rate,
             pos: 0
         }
     }
@@ -41,6 +36,6 @@ impl Filter {
 
         self.pos = (self.pos + 1) % max;
 
-        return out;
+        out
     }
 }

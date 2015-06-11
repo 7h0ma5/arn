@@ -10,7 +10,7 @@ use num::Complex;
 
 mod layer;
 mod audio;
-mod fir;
+mod filter;
 mod qam;
 
 fn main() {

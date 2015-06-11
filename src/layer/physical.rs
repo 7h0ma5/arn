@@ -14,6 +14,8 @@ impl Physical {
         let mut modulator = qam::Modulator::new(16, 250, audio.samp_rate);
         let mut demodulator = qam::Demodulator::new(16, 250, audio.samp_rate);
 
+        audio.start();
+
         Physical {
             modulator: modulator,
             demodulator: demodulator,

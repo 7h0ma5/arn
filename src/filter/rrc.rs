@@ -1,4 +1,4 @@
-use fir::Filter;
+use filter::Filter;
 use std::f64::consts::PI;
 
 impl Filter {
