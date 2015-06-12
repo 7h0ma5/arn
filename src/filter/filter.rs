@@ -1,4 +1,5 @@
 use num::Complex;
+use std::fmt;
 
 pub struct Filter {
     values: Vec<Complex<f32>>,
@@ -37,5 +38,11 @@ impl Filter {
         self.pos = (self.pos + 1) % max;
 
         out
+    }
+}
+
+impl fmt::Debug for Filter {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Filter({})", self.taps.len())
     }
 }

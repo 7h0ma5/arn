@@ -8,7 +8,7 @@ name = "arn"
 doc = true
 
 [profile.dev]
-opt-level = 3
+opt-level = 2
 debug = true
 rpath = false
 lto = false
@@ -18,7 +18,7 @@ debug-assertions = true
 opt-level = 3
 debug = false
 rpath = false
-lto = false
+lto = true
 debug-assertions = false
 
 [profile.doc]

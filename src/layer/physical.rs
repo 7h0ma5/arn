@@ -11,8 +11,8 @@ impl Physical {
     pub fn new() -> Physical {
         let mut audio = audio::Audio::new();
 
-        let mut modulator = qam::Modulator::new(16, 250, audio.samp_rate);
-        let mut demodulator = qam::Demodulator::new(16, 250, audio.samp_rate);
+        let mut modulator = qam::Modulator::new(4, 250, audio.samp_rate);
+        let mut demodulator = qam::Demodulator::new(4, 250, audio.samp_rate);
 
         audio.start();
 

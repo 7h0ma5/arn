@@ -24,7 +24,7 @@ impl Modulator {
         let constellation = Constellation::new(n);
 
         let resampler = Resampler::new(sps, taps, 32);
-        println!("filter ready");
+        println!("{:?}", resampler);
 
         Modulator {
             constellation: constellation,
@@ -41,17 +41,19 @@ impl Modulator {
         let point = self.constellation.points[sym];
         //let samples = self.samp_rate/self.baud_rate;
 
-        //let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
+        let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
 
-        let value = self.resampler.process(point);
+        let values = self.resampler.process(point);
 
-        //let t = self.time as f32;
-        //let phasor = Complex::from_polar(&0.4, &(w * t));
-        //let value = value * phasor;
+        for value in values {
+            let t = self.time as f32;
+            let phasor = Complex::from_polar(&0.4, &(w * t));
+            let value = value * phasor;
 
-        out.write(value.re);
+            out.write(value.re);
 
-        //self.time = (self.time + 1) % self.samp_rate;
+            self.time = (self.time + 1) % self.samp_rate;
+        }
     }
 
     pub fn modulate(&mut self, data: &str, mut out: &mut Audio) {
