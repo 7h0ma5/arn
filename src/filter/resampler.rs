@@ -76,7 +76,6 @@ impl Resampler {
         let mut i = self.last_filter;
 
         while i < self.int_rate {
-            println!("{}", i);
             let o0 = self.filters[i].process(value);
             let o1 = self.diff_filters[i].process(value);
 

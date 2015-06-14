@@ -3,13 +3,9 @@ use std::f64::consts::PI;
 
 impl Filter {
     /// Generate root raised cosine filter taps.
-    ///
-    /// * `gain` - Overall filter gain.
-    /// * `sps` - Samples per symbol.
-    /// * `alpha` - Rolloff factor (0 <= alpha <= 1).
-    /// * `ntaps` - Number of taps to create, should be odd.
-    pub fn rrc(gain: f64, sps: f64, alpha: f64, ntaps: usize) -> Vec<f32> {
+    pub fn rrc(gain: f64, samp_rate: f64, baud_rate: f64, alpha: f64, ntaps: usize) -> Vec<f32> {
         let ntaps = ntaps | 1; // make ntaps odd
+        let sps = samp_rate/baud_rate;
         let mut taps: Vec<f64> = Vec::with_capacity(ntaps);
         let mut scale: f64 = 0.0;
 
@@ -54,8 +50,11 @@ impl Filter {
 
         for tap in taps.iter() {
             let value = tap * gain / scale;
+            println!("{}", value);
             out.push(value as f32);
         }
+
+        //println!("{} taps", out.len());
 
         out
     }

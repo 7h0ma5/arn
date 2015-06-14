@@ -20,7 +20,7 @@ impl Modulator {
         let nfilts = 32;
         let ntaps = nfilts * 11 * sps as usize;
 
-        let taps = Filter::rrc(nfilts as f64, sps as f64, 0.22, ntaps);
+        let taps = Filter::rrc(nfilts as f64, nfilts as f64, 1.0, 0.22, ntaps);
         let constellation = Constellation::new(n);
 
         let resampler = Resampler::new(sps, taps, 32);
@@ -39,11 +39,12 @@ impl Modulator {
     #[inline]
     pub fn modulate_symbol(&mut self, sym: usize, out: &mut Audio) {
         let point = self.constellation.points[sym];
-        //let samples = self.samp_rate/self.baud_rate;
 
         let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
 
         let values = self.resampler.process(point);
+
+        println!("{}", values.len());
 
         for value in values {
             let t = self.time as f32;
