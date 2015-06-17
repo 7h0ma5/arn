@@ -1,5 +1,5 @@
 use filter::Filter;
-use num::Complex;
+use complex::Complex;
 
 #[derive(Debug)]
 pub struct Resampler {
@@ -71,15 +71,15 @@ impl Resampler {
     }
 
     #[inline]
-    pub fn process(&mut self, value: Complex<f32>) -> Vec<Complex<f32>> {
-        let mut out = Vec::new();
+    pub fn process(&mut self, value: &Complex) -> Vec<Complex> {
+        let mut out = Vec::with_capacity(self.int_rate);
         let mut i = self.last_filter;
 
         while i < self.int_rate {
             let o0 = self.filters[i].process(value);
             let o1 = self.diff_filters[i].process(value);
 
-            out.push(o0 + o1.scale(self.acc));
+            out.push(o0 + o1.scale_new(self.acc));
 
             self.acc += self.flt_rate;
             i += self.dec_rate + self.acc.floor() as usize;

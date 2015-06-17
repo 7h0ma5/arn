@@ -1,8 +1,8 @@
-use num::Complex;
+use complex::Complex;
 use std::fmt;
 
 pub struct Filter {
-    values: Vec<Complex<f32>>,
+    values: Vec<Complex>,
     taps: Vec<f32>,
     pos: usize
 }
@@ -23,16 +23,16 @@ impl Filter {
     }
 
     #[inline]
-    pub fn process(&mut self, value: Complex<f32>) -> Complex<f32> {
+    pub fn process(&mut self, value: &Complex) -> Complex {
         let max = self.taps.len();
         let pos = self.pos;
         let mut out = Complex::new(0.0, 0.0);
 
-        self.values[pos] = value;
+        self.values[pos] = value.clone();
 
         for i in 0..max {
             let idx = (pos + i) % max;
-            out = out + self.values[idx].scale(self.taps[i]);
+            out = out + self.values[idx].scale_new(self.taps[i]);
         }
 
         self.pos = (self.pos + 1) % max;

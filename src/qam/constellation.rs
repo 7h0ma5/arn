@@ -1,10 +1,10 @@
 use num::pow;
-use num::Complex;
+use complex::Complex;
 use std::cmp::max;
 
 #[derive(Debug)]
 pub struct Constellation {
-    pub points: Vec<Complex<f32>>,
+    pub points: Vec<Complex>,
     pub avg_power: f32,
     pub bits_per_symbol: usize
 }
@@ -50,8 +50,6 @@ impl Constellation {
                 points[symbol] = point;
                 sum += norm;
 
-                println!("{:b}: {}", symbol, point);
-
                 if (norm > max_amplitude) {
                     max_amplitude = norm;
                 }
@@ -61,7 +59,7 @@ impl Constellation {
         let scale = 1.0/max_amplitude;
 
         for i in 0..points.len() {
-            points[i] = points[i].scale(scale);
+            points[i].scale(scale);
         }
 
         Constellation {

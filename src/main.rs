@@ -6,10 +6,10 @@ extern crate num;
 use std::thread;
 use std::io::prelude::*;
 use std::fs::File;
-use num::Complex;
 
 mod layer;
 mod audio;
+mod complex;
 mod filter;
 mod qam;
 

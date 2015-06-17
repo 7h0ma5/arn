@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use num::Complex;
+use complex::Complex;
 
 use qam::Constellation;
 use filter::{Filter, Resampler};

@@ -1,5 +1,5 @@
 use std::f32::consts::PI;
-use num::Complex;
+use complex::Complex;
 
 use qam::Constellation;
 use filter::{Filter, Resampler};
@@ -10,7 +10,7 @@ pub struct Modulator {
     resampler: Resampler,
     baud_rate: usize,
     samp_rate: usize,
-    carrier: usize,
+    omega: f32,
     time: usize
 }
 
@@ -26,35 +26,34 @@ impl Modulator {
         let resampler = Resampler::new(sps, taps, 32);
         println!("{:?}", resampler);
 
+        let carrier = 1500;
+        let omega = 2.0 * PI * carrier as f32 / samp_rate as f32;
+
         Modulator {
             constellation: constellation,
             resampler: resampler,
             samp_rate: samp_rate,
             baud_rate: baud_rate,
-            carrier: 1500,
+            omega: omega,
             time: 0
         }
     }
 
     #[inline]
     pub fn modulate_symbol(&mut self, sym: usize, out: &mut Audio) {
-        let point = self.constellation.points[sym];
-
-        let w = 2.0 * PI * self.carrier as f32 / self.samp_rate as f32;
-
+        let ref point = self.constellation.points[sym];
         let values = self.resampler.process(point);
 
-        println!("{}", values.len());
-
         for value in values {
-            let t = self.time as f32;
-            let phasor = Complex::from_polar(&0.4, &(w * t));
+            let phasor = Complex::from_polar(0.4, self.omega * self.time as f32);
             let value = value * phasor;
 
             out.write(value.re);
 
-            self.time = (self.time + 1) % self.samp_rate;
+            self.time += 1;
         }
+
+        self.time = self.time % self.samp_rate;
     }
 
     pub fn modulate(&mut self, data: &str, mut out: &mut Audio) {
