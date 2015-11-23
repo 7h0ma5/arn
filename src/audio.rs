@@ -3,7 +3,7 @@ use std::mem::replace;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 
 pub const SAMPLE_RATE: usize = 48000;
-pub const FRAMES_PER_BUFFER: usize = 4096;
+pub const FRAMES_PER_BUFFER: usize = 12000;
 
 pub struct Audio {
     stream: pa::Stream<f32, f32>,

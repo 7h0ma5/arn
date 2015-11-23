@@ -50,7 +50,7 @@ impl Filter {
 
         for tap in taps.iter() {
             let value = tap * gain / scale;
-            println!("{}", value);
+            //println!("{}", value);
             out.push(value as f32);
         }
 

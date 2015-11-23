@@ -14,7 +14,8 @@ mod filter;
 mod qam;
 
 fn main() {
-    let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
+    //let mut f = File::open("/usr/share/licenses/common/GPL3/license.txt").unwrap();
+    let mut f = File::open("/tmp/test.dat").unwrap();
     let mut s = String::new();
     f.read_to_string(&mut s);
 

@@ -17,7 +17,7 @@ pub struct Modulator {
 impl Modulator {
     pub fn new(n: usize, baud_rate: usize, samp_rate: usize) -> Modulator {
         let sps = samp_rate as f32 / baud_rate as f32;
-        let nfilts = 32;
+        let nfilts = 4; // 32
         let ntaps = nfilts * 11 * sps as usize;
 
         let taps = Filter::rrc(nfilts as f64, nfilts as f64, 1.0, 0.22, ntaps);
@@ -45,8 +45,9 @@ impl Modulator {
         let values = self.resampler.process(point);
 
         for value in values {
-            let phasor = Complex::from_polar(0.4, self.omega * self.time as f32);
-            let value = value * phasor;
+            //let phasor = Complex::from_polar(0.1, self.omega * self.time as f32);
+            let mut value = value; // * phasor;
+            value.scale(0.5);
 
             out.write(value.re);
 

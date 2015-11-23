@@ -20,7 +20,7 @@ impl Resampler {
 
         let int_rate = filter_size;
         let dec_rate = (int_rate as f32 / rate).floor() as usize;
-        let flt_rate = (int_rate as f32 / rate) - dec_rate as f32;
+        let flt_rate = (int_rate as f32 / rate) -    dec_rate as f32;
 
         let mut filters = Vec::with_capacity(filter_size);
         let mut diff_taps = Vec::with_capacity(taps.len());
@@ -77,9 +77,11 @@ impl Resampler {
 
         while i < self.int_rate {
             let o0 = self.filters[i].process(value);
-            let o1 = self.diff_filters[i].process(value);
+            //let mut o1 = self.diff_filters[i].process(value);
+            //o1.scale(self.acc);
 
-            out.push(o0 + o1.scale_new(self.acc));
+            //out.push(o0 + o1);
+            out.push(o0);
 
             self.acc += self.flt_rate;
             i += self.dec_rate + self.acc.floor() as usize;
